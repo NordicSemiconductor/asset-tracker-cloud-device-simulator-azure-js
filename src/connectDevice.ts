@@ -14,6 +14,7 @@ export const connectDevice = async ({
 	dps,
 	log,
 	registration,
+	modelId,
 }: {
 	deviceId: string
 	privateKey: Buffer
@@ -22,6 +23,7 @@ export const connectDevice = async ({
 	registration?: DeviceRegistrationState
 	dps: () => Promise<{ serviceOperationsHostName: string; idScope: string }>
 	log?: (...args: any[]) => void
+	modelId?: string
 }): Promise<{
 	client: MqttClient
 	registration: DeviceRegistrationState
@@ -40,7 +42,9 @@ export const connectDevice = async ({
 	return new Promise((resolve, reject) => {
 		try {
 			log?.(`Connecting to`, host)
-
+			const username = `${host}/${deviceId}/?api-version=2020-09-30&model-id=${
+				modelId ?? 'dtmi:azure:DeviceManagement:DeviceInformation;1'
+			}`
 			const client = connect({
 				host,
 				port: 8883,
@@ -49,11 +53,15 @@ export const connectDevice = async ({
 				rejectUnauthorized: true,
 				clientId: deviceId,
 				protocol: 'mqtts',
-				username: `${host}/${deviceId}/?api-version=2018-06-30`,
+				username,
 				version: 4,
 			})
 			client.on('connect', async () => {
 				log?.('Connected', deviceId)
+				log?.(
+					'ModelId',
+					modelId ?? 'dtmi:azure:DeviceManagement:DeviceInformation;1',
+				)
 				resolve({
 					client,
 					registration: acutalRegistration,

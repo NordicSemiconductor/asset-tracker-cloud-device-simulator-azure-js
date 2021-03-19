@@ -146,6 +146,11 @@ export const simulator = async (): Promise<void> => {
 		},
 	} as const
 
+	// See https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/devicemanagement/deviceinformation-1.json
+	const modelData = {
+		manufacturer: 'Nordic Semiconductor ASA',
+	} as const
+
 	let cfg = {
 		...defaultConfig,
 	}
@@ -174,7 +179,7 @@ export const simulator = async (): Promise<void> => {
 		}
 		console.log(chalk.blue('Config:'))
 		console.log(cfg)
-		updateTwinReported({ cfg, ...devRoam })
+		updateTwinReported({ cfg, ...devRoam, ...modelData })
 		sendConfigToUi()
 	}
 
