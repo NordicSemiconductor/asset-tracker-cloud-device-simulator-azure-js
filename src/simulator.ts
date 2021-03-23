@@ -13,6 +13,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import { AzureCliCredentials } from '@azure/ms-rest-nodeauth'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
+import * as os from 'os'
 
 const cellId = process.env.CELL_ID
 
@@ -65,9 +66,10 @@ export const simulator = async (): Promise<void> => {
 	const armDpsClient = new IotDpsClient(
 		creds as any,
 		creds.tokenInfo.subscription,
-	) // FIXME: This removes a TypeScript incompatibility error
+	)
 
 	const { client, registration: actualRegistration } = await connectDevice({
+		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
 		clientCert: Buffer.from(clientCert),
 		caCert: Buffer.from(
@@ -146,9 +148,26 @@ export const simulator = async (): Promise<void> => {
 		},
 	} as const
 
-	// See https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/devicemanagement/deviceinformation-1.json
 	const modelData = {
-		manufacturer: 'Nordic Semiconductor ASA',
+		// See https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/devicemanagement/deviceinformation-1.json
+		deviceInformation: {
+			manufacturer: 'Nordic Semiconductor ASA',
+			model: 'Device Simulator',
+			swVersion: version,
+			osName: os.type(),
+			processorManufacturer: os.arch(),
+			totalStorage: 0,
+			totalMemory: os.totalmem() / 1024,
+		},
+		// See https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-plug-and-play
+		azureDeviceUpdateAgent: {
+			resultCode: 200,
+			state: 0, // Idle
+			deviceProperties: {
+				manufacturer: 'Nordic Semiconductor ASA',
+				model: 'Device Simulator',
+			},
+		},
 	} as const
 
 	let cfg = {
