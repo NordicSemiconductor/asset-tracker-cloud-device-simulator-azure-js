@@ -22,7 +22,6 @@ export const simulator = async (): Promise<void> => {
 	let privateKey: string,
 		clientCert: string,
 		deviceId: string,
-		version: string,
 		resourceGroupName: string,
 		registration: DeviceRegistrationState | undefined,
 		c: any
@@ -41,14 +40,6 @@ export const simulator = async (): Promise<void> => {
 		registration = c.registration
 	} catch {
 		throw new Error(`Failed to parse the certificate JSON using ${certJSON}!`)
-	}
-
-	const packageJSON = path.resolve(__dirname, '..', 'package.json')
-	try {
-		const pjson = JSON.parse(fs.readFileSync(packageJSON, 'utf-8'))
-		version = pjson.version
-	} catch {
-		throw new Error(`Failed to parse ${packageJSON}!`)
 	}
 
 	const creds = await AzureCliCredentials.create()
@@ -120,6 +111,8 @@ export const simulator = async (): Promise<void> => {
 		console.log(chalk.yellow(JSON.stringify(actualRegistration, null, 2)))
 	}
 
+	const version = '1.0.0'
+
 	const devRoam = {
 		dev: {
 			v: {
@@ -148,11 +141,14 @@ export const simulator = async (): Promise<void> => {
 		},
 	} as const
 
+	const manufacturer = 'Nordic-Semiconductor-ASA'
+	const model = 'Device-Simulator'
+
 	const modelData = {
 		// See https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/devicemanagement/deviceinformation-1.json
 		deviceInformation: {
-			manufacturer: 'Nordic Semiconductor ASA',
-			model: 'Device Simulator',
+			manufacturer,
+			model,
 			swVersion: version,
 			osName: os.type(),
 			processorManufacturer: os.arch(),
@@ -164,8 +160,8 @@ export const simulator = async (): Promise<void> => {
 			resultCode: 200,
 			state: 0, // Idle
 			deviceProperties: {
-				manufacturer: 'Nordic Semiconductor ASA',
-				model: 'Device Simulator',
+				manufacturer,
+				model,
 			},
 		},
 	} as const
