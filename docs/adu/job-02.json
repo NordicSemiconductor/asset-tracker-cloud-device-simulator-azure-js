@@ -1,0 +1,12 @@
+{
+  "azureDeviceUpdateAgent": {
+    "__t": "c",
+    "service": {
+      "action": 1,
+      "updateManifest": "...",
+      "updateManifestSignature": "eyJhbG...",
+      "fileUrls": null
+    }
+  },
+  "$version": 3
+}

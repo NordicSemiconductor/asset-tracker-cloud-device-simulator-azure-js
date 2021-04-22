@@ -147,6 +147,7 @@ export const simulator = async (): Promise<void> => {
 	const modelData = {
 		// See https://github.com/Azure/iot-plugandplay-models/blob/main/dtmi/azure/devicemanagement/deviceinformation-1.json
 		deviceInformation: {
+			__t: 'c',
 			manufacturer,
 			model,
 			swVersion: version,
@@ -157,11 +158,15 @@ export const simulator = async (): Promise<void> => {
 		},
 		// See https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-plug-and-play
 		azureDeviceUpdateAgent: {
-			resultCode: 200,
-			state: 0, // Idle
-			deviceProperties: {
-				manufacturer,
-				model,
+			__t: 'c',
+			client: {
+				resultCode: 200,
+				state: 0, // Idle
+				deviceProperties: {
+					manufacturer,
+					model,
+				},
+				installedUpdateId: null,
 			},
 		},
 	} as const
@@ -221,6 +226,142 @@ export const simulator = async (): Promise<void> => {
 		}, 10 * 1000)
 	}
 
+	/**
+	 * Simulate Azure Device Update
+	 * @see https://docs.microsoft.com/en-us/azure/iot-hub-device-update/device-update-plug-and-play
+	 * @see https://github.com/Azure/iot-hub-device-update/blob/7a6e4c12d54df7a92984e935c3050f35e359a342/src/agent/adu_core_interface/src/agent_workflow.c
+	 *
+	 *                    ┌───┐                                     ┌──────┐
+	 *                    │CBO│                                     │Client│
+	 *                    └─┬─┘                                     └──┬───┘
+	 *                      │          UpdateAction: Download          │
+	 *                      │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ DownloadStarted (Internal Client State)
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ Download content
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │                                          │
+	 *          ╔══════╤════╪══════════════════════════════════════════╪═════════════╗
+	 *          ║ ALT  │  Successful Download                          │             ║
+	 *          ╟──────┘    │                                          │             ║
+	 *          ║           │      UpdateState: DownloadSucceeded      │             ║
+	 *          ║           │<──────────────────────────────────────────             ║
+	 *          ╠═══════════╪══════════════════════════════════════════╪═════════════╣
+	 *          ║ [Failed Download]                                    │             ║
+	 *          ║           │           UpdateState: Failed            │             ║
+	 *          ║           │<──────────────────────────────────────────             ║
+	 *          ║           │                                          │             ║
+	 *          ║           │           UpdateAction: Cancel           │             ║
+	 *          ║           │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>             ║
+	 *          ║           │                                          │             ║
+	 *          ║           │            UpdateState: Idle             │             ║
+	 *          ║           │<──────────────────────────────────────────             ║
+	 *          ╠═══════════╪══════════════════════════════════════════╪═════════════╣
+	 *          ║ [Cancel received during "Download content"]          │             ║
+	 *          ║           │            UpdateState: Idle             │             ║
+	 *          ║           │<──────────────────────────────────────────             ║
+	 *          ╚═══════════╪══════════════════════════════════════════╪═════════════╝
+	 *                      │                                          │
+	 *                      │          UpdateAction: Install           │
+	 *                      │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ InstallStarted (Internal Client State)
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ Install content
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │UpdateState: InstallSucceeded (on success)│
+	 *                      │<──────────────────────────────────────────
+	 *                      │                                          │
+	 *                      │           UpdateAction: Apply            │
+	 *                      │ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─>
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ ApplyStarted (Internal Client State)
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │                                          │────┐
+	 *                      │                                          │    │ Apply content
+	 *                      │                                          │<───┘
+	 *                      │                                          │
+	 *                      │      UpdateState: Idle (on success)      │
+	 *                      │<──────────────────────────────────────────
+	 *                    ┌─┴─┐                                     ┌──┴───┐
+	 *                    │CBO│                                     │Client│
+	 *                    └───┘                                     └──────┘
+	 *
+	 */
+	const simulateADU = (desired: Record<string, any>) => {
+		if (desired.azureDeviceUpdateAgent?.service?.action === 0) {
+			// Download
+			// Download requests
+			// console.log('ADU service', desired.azureDeviceUpdateAgent.service)
+			console.log(chalk.blue('ADU'), chalk.blueBright(`Downloading Update`))
+			Object.values(desired.azureDeviceUpdateAgent?.service?.fileUrls).forEach(
+				(url) => {
+					console.log('-', chalk.yellow(url))
+				},
+			)
+			updateTwinReported({
+				azureDeviceUpdateAgent: {
+					client: {
+						state: 2, // DownloadSucceeded
+					},
+				},
+			})
+		} else if (desired.azureDeviceUpdateAgent?.service?.action === 1) {
+			// Install
+			// console.log('ADU service', desired.azureDeviceUpdateAgent.service)
+			console.log(chalk.blue('ADU'), chalk.blueBright(`Installing Update`))
+			updateTwinReported({
+				azureDeviceUpdateAgent: {
+					client: {
+						state: 4, // InstallSucceeded
+						installedUpdateId: JSON.parse(
+							desired.azureDeviceUpdateAgent?.service?.updateManifest,
+						).updateId,
+					},
+				},
+			})
+		} else if (desired.azureDeviceUpdateAgent?.service?.action === 2) {
+			// Apply (and reboot)
+			// console.log('ADU service', desired.azureDeviceUpdateAgent.service)
+			console.log(chalk.blue('ADU'), chalk.blueBright(`Apply Update`))
+			updateTwinReported({
+				deviceInformation: {
+					swVersion: JSON.parse(
+						desired.azureDeviceUpdateAgent?.service?.updateManifest,
+					).installedCriteria,
+				},
+				azureDeviceUpdateAgent: {
+					client: {
+						state: 0, // Idle
+					},
+				},
+			})
+		} else if (desired.azureDeviceUpdateAgent?.service?.action === 255) {
+			// Abort
+			// console.log('ADU service', desired.azureDeviceUpdateAgent.service)
+			console.log(chalk.blue('ADU'), chalk.blueBright(`Aborting Update`))
+			updateTwinReported({
+				azureDeviceUpdateAgent: {
+					client: {
+						state: 0, // Idle
+						installedUpdateId: null,
+					},
+				},
+			})
+		}
+	}
+
 	// See https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#update-device-twins-reported-properties
 	// A device must first subscribe to the $iothub/twin/res/# topic to receive the operation's responses from IoT Hub.
 	client.subscribe(deviceTopics.twinResponses)
@@ -271,13 +412,13 @@ export const simulator = async (): Promise<void> => {
 	const getTwinPropertiesTopic = deviceTopics.getTwinProperties(
 		getTwinPropertiesRequestId,
 	)
-	console.log(chalk.magenta('>'), chalk.yellow(getTwinPropertiesTopic))
+	console.log(chalk.magenta('<'), chalk.yellow(getTwinPropertiesTopic))
 	client.publish(getTwinPropertiesTopic, '')
 
 	client.on('message', (topic, payload) => {
-		console.log(chalk.magenta('<'), chalk.yellow(topic))
+		console.log(chalk.magenta('>'), chalk.yellow(topic))
 		if (payload.length) {
-			console.log(chalk.magenta('<'), chalk.cyan(payload.toString()))
+			console.log(chalk.magenta('>'), chalk.cyan(payload.toString()))
 		}
 		// Handle update reported messages
 		if (
@@ -289,6 +430,7 @@ export const simulator = async (): Promise<void> => {
 		) {
 			const p = JSON.parse(payload.toString())
 			updateConfig(p.desired.cfg)
+			simulateADU(p.desired)
 			return
 		}
 		if (deviceTopics.updateTwinReportedAccepted.test(topic)) {
@@ -304,6 +446,7 @@ export const simulator = async (): Promise<void> => {
 			if (desiredUpdate.firmware !== undefined) {
 				simulateFota(desiredUpdate.firmware)
 			}
+			simulateADU(desiredUpdate)
 			return
 		}
 		console.error(chalk.red(`Unexpected topic:`), chalk.yellow(topic))
