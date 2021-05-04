@@ -325,9 +325,11 @@ export const simulator = async (): Promise<void> => {
 				azureDeviceUpdateAgent: {
 					client: {
 						state: 4, // InstallSucceeded
-						installedUpdateId: JSON.parse(
-							desired.azureDeviceUpdateAgent?.service?.updateManifest,
-						).updateId,
+						installedUpdateId: JSON.stringify(
+							JSON.parse(
+								desired.azureDeviceUpdateAgent?.service?.updateManifest,
+							).updateId,
+						),
 					},
 				},
 			})
