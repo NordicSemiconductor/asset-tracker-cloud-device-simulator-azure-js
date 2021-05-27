@@ -71,15 +71,12 @@ export const simulator = async (): Promise<void> => {
 		),
 		deviceId,
 		registration,
-		dps: async () => {
+		dpsIdScope: async () => {
 			const dps = await armDpsClient.iotDpsResource.get(
 				`${resourceGroupName}ProvisioningService`,
 				resourceGroupName,
 			)
-			return dps.properties as {
-				serviceOperationsHostName: string
-				idScope: string
-			}
+			return dps.properties.idScope as string
 		},
 		log: (info, context, ...rest) =>
 			console.log(

@@ -11,7 +11,7 @@ export const connectDevice = async ({
 	privateKey,
 	clientCert,
 	caCert,
-	dps,
+	dpsIdScope,
 	log,
 	registration,
 	modelId,
@@ -21,7 +21,7 @@ export const connectDevice = async ({
 	clientCert: Buffer
 	caCert: Buffer
 	registration?: DeviceRegistrationState
-	dps: () => Promise<{ serviceOperationsHostName: string; idScope: string }>
+	dpsIdScope: () => Promise<string>
 	log?: (...args: any[]) => void
 	modelId?: string
 }): Promise<{
@@ -34,7 +34,7 @@ export const connectDevice = async ({
 			caCert,
 			clientCert,
 			deviceId,
-			dps,
+			dpsIdScope,
 			privateKey,
 			log,
 		}))

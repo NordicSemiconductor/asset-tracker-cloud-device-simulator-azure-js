@@ -8,26 +8,27 @@ export const provision = async ({
 	privateKey,
 	clientCert,
 	deviceId,
-	dps,
+	dpsIdScope,
 	log,
 }: {
 	deviceId: string
 	privateKey: Buffer
 	clientCert: Buffer
 	caCert: Buffer
-	dps: () => Promise<{ serviceOperationsHostName: string; idScope: string }>
+	dpsIdScope: () => Promise<string>
 	log?: (...args: any[]) => void
 }): Promise<DeviceRegistrationState> => {
 	// Connect to Device Provisioning Service using MQTT
 	// @see https://docs.microsoft.com/en-us/azure/iot-dps/iot-dps-mqtt-support
 
-	const { serviceOperationsHostName: dpsHostname, idScope } = await dps()
+	const idScope = await dpsIdScope()
+	const host = 'global.azure-devices-provisioning.net'
 
-	log?.(`Connecting to`, dpsHostname)
+	log?.(`Connecting to`, host)
 	log?.(`ID scope`, idScope)
 
 	const client = connect({
-		host: dpsHostname,
+		host,
 		port: 8883,
 		key: privateKey,
 		cert: clientCert,
