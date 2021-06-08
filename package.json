@@ -29,7 +29,7 @@
     "@azure/ms-rest-nodeauth": "3.0.10",
     "@nordicsemiconductor/asset-tracker-cloud-device-ui-server": "4.0.1",
     "azure-iot-provisioning-service": "1.8.8",
-    "azure-iothub": "1.14.0",
+    "azure-iothub": "1.14.1",
     "chalk": "4.1.1",
     "mqtt": "4.2.6",
     "node-fetch": "2.6.1",
