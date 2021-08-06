@@ -375,7 +375,7 @@ export const simulator = async (): Promise<void> => {
 	const port = await uiServer({
 		deviceId: deviceId,
 		onUpdate: updateTwinReported,
-		onMessage: (message) => {
+		onSensorMessage: (message) => {
 			console.log(
 				chalk.magenta('>'),
 				chalk.yellow(deviceTopics.messages(deviceId)),
