@@ -422,7 +422,7 @@ export const simulator = async (): Promise<void> => {
 		},
 		onMessage: {
 			'/pgps/get': locationDataHandler('pgps=get'),
-			'/agps/get': locationDataHandler('pgps=get'),
+			'/agps/get': locationDataHandler('agps=get'),
 		},
 	})
 
