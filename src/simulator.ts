@@ -173,11 +173,19 @@ export const simulator = async (): Promise<void> => {
 	}
 
 	let wsConnection: WebSocketConnection
+	const wsNotify = (message: Record<string, any>) => {
+		if (wsConnection !== undefined) {
+			console.log(chalk.magenta('[ws>'), JSON.stringify(message))
+			wsConnection.send(JSON.stringify(message))
+		} else {
+			console.warn(chalk.red('Websocket not connected.'))
+		}
+	}
 
 	const sendConfigToUi = () => {
 		if (wsConnection !== undefined) {
 			console.log(chalk.magenta('[ws>'), JSON.stringify(cfg))
-			wsConnection.send(JSON.stringify(cfg))
+			wsNotify({ config: cfg })
 		}
 	}
 
@@ -199,6 +207,18 @@ export const simulator = async (): Promise<void> => {
 		updateTwinReported({ cfg, ...devRoam, ...modelData })
 		sendConfigToUi()
 	}
+
+	const locationDataHandler =
+		(properties: string) => (message: string, path: string) => {
+			console.log(chalk.magenta('[ws<'), JSON.stringify({ message, path }))
+			const topic = `devices/${deviceId}/messages/events/${properties}`
+			console.log(
+				chalk.magenta('<'),
+				chalk.blue.blueBright(topic),
+				chalk.cyan(message),
+			)
+			client.publish(topic, message)
+		}
 
 	/**
 	 * Simulate the FOTA process
@@ -368,6 +388,10 @@ export const simulator = async (): Promise<void> => {
 	// See https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#receiving-desired-properties-update-notifications
 	client.subscribe(deviceTopics.desiredUpdate.name)
 
+	// A-GPS and P-GPS
+	client.subscribe(`${deviceId}/pgps`)
+	client.subscribe(`${deviceId}/agps`)
+
 	const getTwinPropertiesRequestId = v4()
 
 	console.log(chalk.green('Connected:'), chalk.blueBright(deviceId))
@@ -395,6 +419,10 @@ export const simulator = async (): Promise<void> => {
 			console.log(chalk.magenta('[ws]'), chalk.cyan('connected'))
 			wsConnection = c
 			sendConfigToUi()
+		},
+		onMessage: {
+			'/pgps/get': locationDataHandler('pgps=get'),
+			'/agps/get': locationDataHandler('pgps=get'),
 		},
 	})
 
@@ -448,7 +476,8 @@ export const simulator = async (): Promise<void> => {
 			simulateADU(desiredUpdate)
 			return
 		}
-		console.error(chalk.red(`Unexpected topic:`), chalk.yellow(topic))
+
+		wsNotify({ message: { topic, payload: payload.toString() } })
 	})
 
 	client.on('error', (err) => {
