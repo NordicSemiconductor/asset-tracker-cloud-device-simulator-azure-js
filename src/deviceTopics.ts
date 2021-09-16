@@ -1,3 +1,13 @@
+import { encodePropertyBag, PropertyBag } from './encodePropertyBag'
+
+const encodingProperties = {
+	'$.ct': 'application/json',
+	'$.ce': 'utf-8',
+}
+
+const messages = (deviceId: string, properties?: PropertyBag): string =>
+	`devices/${deviceId}/messages/events/${encodePropertyBag(properties)}`
+
 export const deviceTopics = {
 	getTwinProperties: (rid: string): string => `$iothub/twin/GET/?$rid=${rid}`,
 	getTwinPropertiesAccepted: (rid: string): string =>
@@ -17,8 +27,8 @@ export const deviceTopics = {
 	},
 	twinResponse: ({ status, rid }: { status: number; rid: string }): string =>
 		`$iothub/twin/res/${status}/?$rid=${rid}`,
-	messages: (deviceId: string): string =>
-		`devices/${deviceId}/messages/events/`,
+	messages: (deviceId: string, properties?: PropertyBag): string =>
+		messages(deviceId, { ...encodingProperties, ...properties }),
 	batch: (deviceId: string): string =>
-		`devices/${deviceId}/messages/events/batch`,
+		messages(deviceId, { ...encodingProperties, batch: null }),
 }

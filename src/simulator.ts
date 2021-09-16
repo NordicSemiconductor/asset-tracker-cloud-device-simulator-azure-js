@@ -209,9 +209,8 @@ export const simulator = async (): Promise<void> => {
 	}
 
 	const locationDataHandler =
-		(properties: string) => (message: string, path: string) => {
+		(topic: string) => (message: string, path: string) => {
 			console.log(chalk.magenta('[ws<'), JSON.stringify({ message, path }))
-			const topic = `devices/${deviceId}/messages/events/${properties}`
 			console.log(
 				chalk.magenta('<'),
 				chalk.blue.blueBright(topic),
@@ -421,8 +420,12 @@ export const simulator = async (): Promise<void> => {
 			sendConfigToUi()
 		},
 		onMessage: {
-			'/pgps/get': locationDataHandler('pgps=get'),
-			'/agps/get': locationDataHandler('agps=get'),
+			'/pgps/get': locationDataHandler(
+				deviceTopics.messages(deviceId, { pgps: 'get' }),
+			),
+			'/agps/get': locationDataHandler(
+				deviceTopics.messages(deviceId, { agps: 'get' }),
+			),
 		},
 	})
 
