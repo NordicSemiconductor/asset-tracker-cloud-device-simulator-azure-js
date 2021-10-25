@@ -41,7 +41,7 @@
     "@commitlint/config-angular": "13.2.0",
     "@nordicsemiconductor/asset-tracker-cloud-code-style": "9.2.0",
     "@types/jest": "27.0.2",
-    "@types/node": "16.4.13",
+    "@types/node": "16.11.4",
     "@types/uuid": "8.3.1",
     "husky": "7.0.4",
     "jest": "27.3.1",
