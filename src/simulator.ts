@@ -208,16 +208,15 @@ export const simulator = async (): Promise<void> => {
 		sendConfigToUi()
 	}
 
-	const locationDataHandler =
-		(topic: string) => (message: string, path: string) => {
-			console.log(chalk.magenta('[ws<'), JSON.stringify({ message, path }))
-			console.log(
-				chalk.magenta('<'),
-				chalk.blue.blueBright(topic),
-				chalk.cyan(message),
-			)
-			client.publish(topic, message)
-		}
+	const messageHandler = (topic: string) => (message: string, path: string) => {
+		console.log(chalk.magenta('[ws<'), JSON.stringify({ message, path }))
+		console.log(
+			chalk.magenta('<'),
+			chalk.blue.blueBright(topic),
+			chalk.cyan(message),
+		)
+		client.publish(topic, message)
+	}
 
 	/**
 	 * Simulate the FOTA process
@@ -420,11 +419,14 @@ export const simulator = async (): Promise<void> => {
 			sendConfigToUi()
 		},
 		onMessage: {
-			'/pgps/get': locationDataHandler(
+			'/pgps/get': messageHandler(
 				deviceTopics.messages(deviceId, { pgps: 'get' }),
 			),
-			'/agps/get': locationDataHandler(
+			'/agps/get': messageHandler(
 				deviceTopics.messages(deviceId, { agps: 'get' }),
+			),
+			'/ncellmeas': messageHandler(
+				deviceTopics.messages(deviceId, { ncellmeas: null }),
 			),
 		},
 	})
