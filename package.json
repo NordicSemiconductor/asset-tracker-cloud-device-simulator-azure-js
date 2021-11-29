@@ -3,6 +3,7 @@
   "version": "0.0.0-development",
   "description": "Simulates Cat Tracker for the nRF Asset Tracker for Azure",
   "bin": "./simulator.js",
+  "type": "module",
   "scripts": {
     "test": "jest",
     "postinstall": "husky install",
@@ -77,5 +78,10 @@
     "simulator.js",
     "LICENSE",
     "README.md"
-  ]
+  ],
+  "prettier": "@nordicsemiconductor/asset-tracker-cloud-code-style/.prettierrc",
+  "jest": {
+    "preset": "ts-jest",
+    "testRegex": ".+\\.spec\\.ts$"
+  }
 }
