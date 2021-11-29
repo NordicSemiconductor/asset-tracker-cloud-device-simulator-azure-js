@@ -1,4 +1,4 @@
-import chalk from 'chalk'
+import * as chalk from 'chalk'
 import { IotDpsClient } from '@azure/arm-deviceprovisioningservices'
 import { v4 } from 'uuid'
 import {

@@ -3,7 +3,6 @@
   "version": "0.0.0-development",
   "description": "Simulates Cat Tracker for the nRF Asset Tracker for Azure",
   "bin": "./simulator.js",
-  "type": "module",
   "scripts": {
     "test": "jest",
     "postinstall": "husky install",
@@ -32,7 +31,7 @@
     "@nordicsemiconductor/asset-tracker-cloud-device-ui-server": "4.2.1",
     "azure-iot-provisioning-service": "1.9.0",
     "azure-iothub": "1.14.6",
-    "chalk": "5.0.0",
+    "chalk": "4.1.2",
     "mqtt": "4.2.8",
     "node-fetch": "3.1.0",
     "uuid": "8.3.2"
@@ -78,10 +77,5 @@
     "simulator.js",
     "LICENSE",
     "README.md"
-  ],
-  "prettier": "@nordicsemiconductor/asset-tracker-cloud-code-style/.prettierrc",
-  "jest": {
-    "preset": "ts-jest",
-    "testRegex": ".+\\.spec\\.ts$"
-  }
+  ]
 }
