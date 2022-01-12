@@ -1,19 +1,19 @@
-import * as chalk from 'chalk'
 import { IotDpsClient } from '@azure/arm-deviceprovisioningservices'
-import { v4 } from 'uuid'
+import { AzureCliCredentials } from '@azure/ms-rest-nodeauth'
 import {
 	uiServer,
 	WebSocketConnection,
 } from '@nordicsemiconductor/asset-tracker-cloud-device-ui-server'
-import { deviceTopics } from './deviceTopics'
-import { defaultConfig } from './defaultConfig'
-import { connectDevice } from './connectDevice'
-import { Status } from './fota'
-import * as fs from 'fs'
-import * as path from 'path'
-import { AzureCliCredentials } from '@azure/ms-rest-nodeauth'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
+import * as chalk from 'chalk'
+import * as fs from 'fs'
 import * as os from 'os'
+import * as path from 'path'
+import { v4 } from 'uuid'
+import { connectDevice } from './connectDevice'
+import { defaultConfig } from './defaultConfig'
+import { deviceTopics } from './deviceTopics'
+import { Status } from './fota'
 
 const cellId = process.env.CELL_ID
 
@@ -113,16 +113,17 @@ export const simulator = async (): Promise<void> => {
 	const devRoam = {
 		dev: {
 			v: {
-				band: 666,
-				nw: 'LAN',
 				modV: 'device-simulator',
 				brdV: 'device-simulator',
 				iccid: '12345678901234567890',
+				imei: '352656106111232',
 			},
 			ts: Date.now(),
 		},
 		roam: {
 			v: {
+				band: 666,
+				nw: 'LAN',
 				rsrp: -70,
 				area: 30401,
 				mccmnc: 24201,
