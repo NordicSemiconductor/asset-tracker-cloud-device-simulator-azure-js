@@ -1,8 +1,8 @@
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import { connect } from 'mqtt'
-import { dpsTopics } from './dpsTopics'
 import { URLSearchParams } from 'url'
 import { v4 } from 'uuid'
+import { dpsTopics } from './dpsTopics'
 
 export const provision = async ({
 	privateKey,

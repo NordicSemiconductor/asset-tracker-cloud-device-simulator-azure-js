@@ -1,5 +1,5 @@
-import { connect, MqttClient } from 'mqtt'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
+import { connect, MqttClient } from 'mqtt'
 import { provision } from './provision'
 
 /**

@@ -1,0 +1,7 @@
+commitlint.config.js
+node_modules/
+dist/
+certificates/
+build/
+jest.config.js
+simulator.js
