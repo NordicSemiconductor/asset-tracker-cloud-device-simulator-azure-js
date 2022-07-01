@@ -1,8 +1,8 @@
 /** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
-module.exports = {
+export default {
 	transform: {
 		'^.+\\.(t|j)sx?$': ['@swc/jest'],
 	},
 	testEnvironment: 'node',
-	testMatch: ['**/src/**/*.spec.ts'],
+	testMatch: ['**/simulator/**/*.spec.ts'],
 }

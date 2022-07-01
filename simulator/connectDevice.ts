@@ -11,7 +11,7 @@ export const connectDevice = async ({
 	privateKey,
 	clientCert,
 	caCert,
-	dpsIdScope,
+	idScope,
 	log,
 	registration,
 	modelId,
@@ -21,7 +21,7 @@ export const connectDevice = async ({
 	clientCert: Buffer
 	caCert: Buffer
 	registration?: DeviceRegistrationState
-	dpsIdScope: () => Promise<string>
+	idScope: string
 	log?: (...args: any[]) => void
 	modelId?: string
 }): Promise<{
@@ -34,7 +34,7 @@ export const connectDevice = async ({
 			caCert,
 			clientCert,
 			deviceId,
-			dpsIdScope,
+			idScope,
 			privateKey,
 			log,
 		}))
@@ -54,7 +54,7 @@ export const connectDevice = async ({
 				clientId: deviceId,
 				protocol: 'mqtts',
 				username,
-				version: 4,
+				protocolVersion: 4,
 			})
 			client.on('connect', async () => {
 				log?.('Connected', deviceId)

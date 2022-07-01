@@ -4,7 +4,6 @@
 # see ADR 5 in https://github.com/NordicSemiconductor/asset-tracker-cloud-docs/
 node_modules/
 npm-debug.log
-dist/
 certificates/
 build/
 local.settings.json

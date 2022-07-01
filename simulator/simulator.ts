@@ -1,14 +1,14 @@
-import { IotDpsClient } from '@azure/arm-deviceprovisioningservices'
 import { AzureCliCredentials } from '@azure/ms-rest-nodeauth'
 import {
 	uiServer,
 	WebSocketConnection,
 } from '@nordicsemiconductor/asset-tracker-cloud-device-ui-server'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
-import * as chalk from 'chalk'
+import chalk from 'chalk'
 import * as fs from 'fs'
 import * as os from 'os'
 import * as path from 'path'
+import { fileURLToPath } from 'url'
 import { v4 } from 'uuid'
 import { connectDevice } from './connectDevice'
 import { defaultConfig } from './defaultConfig'
@@ -17,6 +17,8 @@ import { Status } from './fota'
 
 const cellId = process.env.CELL_ID
 
+const __dirname = fileURLToPath(import.meta.url)
+
 export const simulator = async (): Promise<void> => {
 	const certJSON = process.argv[process.argv.length - 1]
 	let privateKey: string,
@@ -24,6 +26,7 @@ export const simulator = async (): Promise<void> => {
 		deviceId: string,
 		resourceGroupName: string,
 		registration: DeviceRegistrationState | undefined,
+		idScope: string,
 		c: any
 	try {
 		c = JSON.parse(fs.readFileSync(certJSON, 'utf-8')) as {
@@ -32,12 +35,14 @@ export const simulator = async (): Promise<void> => {
 			clientId: string
 			resourceGroup: string
 			registration?: DeviceRegistrationState
+			idScope: string
 		}
 		privateKey = c.privateKey
 		clientCert = c.clientCert
 		deviceId = c.clientId
 		resourceGroupName = c.resourceGroup
 		registration = c.registration
+		idScope = c.idScope
 	} catch {
 		throw new Error(`Failed to parse the certificate JSON using ${certJSON}!`)
 	}
@@ -54,30 +59,25 @@ export const simulator = async (): Promise<void> => {
 		chalk.yellow(resourceGroupName),
 	)
 
-	const armDpsClient = new IotDpsClient(
-		creds as any,
-		creds.tokenInfo.subscription,
-	)
-
 	const { client, registration: actualRegistration } = await connectDevice({
 		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
 		clientCert: Buffer.from(clientCert),
 		caCert: Buffer.from(
 			fs.readFileSync(
-				path.resolve(__dirname, '..', 'data', 'BaltimoreCyberTrustRoot.pem'),
+				path.resolve(
+					__dirname,
+					'..',
+					'..',
+					'data',
+					'BaltimoreCyberTrustRoot.pem',
+				),
 				'utf-8',
 			),
 		),
 		deviceId,
 		registration,
-		dpsIdScope: async () => {
-			const dps = await armDpsClient.iotDpsResource.get(
-				`${resourceGroupName}ProvisioningService`,
-				resourceGroupName,
-			)
-			return dps.properties.idScope as string
-		},
+		idScope,
 		log: (info, context, ...rest) =>
 			console.log(
 				chalk.magenta(`${info}:`),

@@ -1,15 +1,16 @@
-#!/usr/bin/env node
+#!/usr/bin/env -S npx tsx
 
-const chalk = require('chalk')
+import chalk from 'chalk'
+import { simulator } from './simulator'
 
-const die = (err) => {
+const die = (err: Error) => {
 	console.error(chalk.red(`An unhandled exception occured!`))
 	console.error(chalk.red(err.message))
+	console.error(err)
 	process.exit(1)
 }
 
 process.on('uncaughtException', die)
 process.on('unhandledRejection', die)
 
-const { simulator } = require('./dist/simulator')
-simulator()
+simulator().catch(die)
