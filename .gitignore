@@ -5,7 +5,7 @@
 node_modules/
 npm-debug.log
 certificates/
-build/
 local.settings.json
 ci-credentials.json
 log.log
+dist/

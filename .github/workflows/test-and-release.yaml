@@ -26,6 +26,8 @@ jobs:
         run: npm ci --no-audit
       - name: Check TypeScript
         run: npx tsc
+      - name: Compile dist
+        run: npx swc ./simulator -d ./dist
       - name: Semantic release
         continue-on-error: true
         run: |
