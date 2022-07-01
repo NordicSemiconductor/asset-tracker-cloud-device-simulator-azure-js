@@ -4,4 +4,3 @@ dist/
 certificates/
 build/
 jest.config.js
-simulator.js

@@ -2,7 +2,7 @@
   "name": "@nordicsemiconductor/asset-tracker-cloud-device-simulator-azure",
   "version": "0.0.0-development",
   "description": "Simulates an nRF9160-based device for the nRF Asset Tracker for Azure.",
-  "bin": "./dist/simulator.js",
+  "bin": "./dist/cli.js",
   "type": "module",
   "scripts": {
     "test": "jest",
