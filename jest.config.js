@@ -5,4 +5,8 @@ export default {
 	},
 	testEnvironment: 'node',
 	testMatch: ['**/simulator/**/*.spec.ts'],
+	extensionsToTreatAsEsm: ['.ts'],
+	moduleNameMapper: {
+		'^simulator\\/(.*)\\.js$': '<rootDir>/simulator/$1',
+	},
 }
