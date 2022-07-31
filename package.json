@@ -32,7 +32,7 @@
     "azure-iothub": "1.15.0",
     "chalk": "5.0.1",
     "mqtt": "4.3.7",
-    "node-fetch": "3.2.9",
+    "node-fetch": "3.2.10",
     "regenerator-runtime": "0.13.9",
     "uuid": "8.3.2"
   },
