@@ -27,7 +27,7 @@ jobs:
       - name: Check TypeScript
         run: npx tsc
       - name: Compile dist
-        run: npx swc ./simulator -d ./dist
+        run: npm run compile
       - name: Semantic release
         continue-on-error: true
         run: |
