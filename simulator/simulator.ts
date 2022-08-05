@@ -1,4 +1,3 @@
-import { AzureCliCredentials } from '@azure/ms-rest-nodeauth'
 import {
 	uiServer,
 	WebSocketConnection,
@@ -24,7 +23,6 @@ export const simulator = async (): Promise<void> => {
 	let privateKey: string,
 		clientCert: string,
 		deviceId: string,
-		resourceGroupName: string,
 		registration: DeviceRegistrationState | undefined,
 		idScope: string,
 		c: any
@@ -40,24 +38,11 @@ export const simulator = async (): Promise<void> => {
 		privateKey = c.privateKey
 		clientCert = c.clientCert
 		deviceId = c.clientId
-		resourceGroupName = c.resourceGroup
 		registration = c.registration
 		idScope = c.idScope
 	} catch {
 		throw new Error(`Failed to parse the certificate JSON using ${certJSON}!`)
 	}
-
-	const creds = await AzureCliCredentials.create()
-
-	const {
-		tokenInfo: { subscription },
-	} = creds
-
-	console.error(chalk.magenta('Subscription:'), chalk.yellow(subscription))
-	console.error(
-		chalk.magenta('Resource Group:'),
-		chalk.yellow(resourceGroupName),
-	)
 
 	const { client, registration: actualRegistration } = await connectDevice({
 		modelId: 'dtmi:AzureDeviceUpdate;1',
