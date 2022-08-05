@@ -1,5 +1,3 @@
-#!/usr/bin/env -S npx tsx
-
 import { simulator } from '#simulator/simulator.js'
 import chalk from 'chalk'
 
