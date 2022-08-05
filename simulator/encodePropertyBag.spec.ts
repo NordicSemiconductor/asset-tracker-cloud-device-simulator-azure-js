@@ -1,4 +1,4 @@
-import { encodePropertyBag } from './encodePropertyBag'
+import { encodePropertyBag } from '#simulator/encodePropertyBag.js'
 
 describe('encodePropertyBag', () => {
 	it.each([undefined, {}])('should return an empty string for %j', (bag) =>

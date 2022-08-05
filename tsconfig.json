@@ -5,6 +5,10 @@
     "noEmit": true,
     "moduleResolution": "node",
     "module": "ES2020",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "#simulator/*": ["simulator/*"]
+    }
   }
 }

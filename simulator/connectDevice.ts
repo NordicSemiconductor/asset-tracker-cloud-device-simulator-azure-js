@@ -1,6 +1,6 @@
+import { provision } from '#simulator/provision.js'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import { connect, MqttClient } from 'mqtt'
-import { provision } from './provision'
 
 /**
  * Connect the device to the Azure IoT Hub.

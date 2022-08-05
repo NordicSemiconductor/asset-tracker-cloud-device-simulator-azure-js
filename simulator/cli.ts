@@ -1,7 +1,7 @@
 #!/usr/bin/env -S npx tsx
 
+import { simulator } from '#simulator/simulator.js'
 import chalk from 'chalk'
-import { simulator } from './simulator'
 
 const die = (err: Error) => {
 	console.error(chalk.red(`An unhandled exception occured!`))

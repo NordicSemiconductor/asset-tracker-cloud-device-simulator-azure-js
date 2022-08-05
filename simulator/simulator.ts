@@ -1,3 +1,7 @@
+import { connectDevice } from '#simulator/connectDevice.js'
+import { defaultConfig } from '#simulator/defaultConfig.js'
+import { deviceTopics } from '#simulator/deviceTopics.js'
+import { Status } from '#simulator/fota.js'
 import {
 	uiServer,
 	WebSocketConnection,
@@ -9,10 +13,6 @@ import * as os from 'os'
 import * as path from 'path'
 import { fileURLToPath } from 'url'
 import { v4 } from 'uuid'
-import { connectDevice } from './connectDevice'
-import { defaultConfig } from './defaultConfig'
-import { deviceTopics } from './deviceTopics'
-import { Status } from './fota'
 
 const cellId = process.env.CELL_ID
 
