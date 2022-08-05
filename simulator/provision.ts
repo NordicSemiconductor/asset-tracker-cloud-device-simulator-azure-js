@@ -14,7 +14,6 @@ export const provision = async ({
 	deviceId: string
 	privateKey: Buffer
 	clientCert: Buffer
-	caCert: Buffer
 	idScope: string
 	log?: (...args: any[]) => void
 }): Promise<DeviceRegistrationState> => {

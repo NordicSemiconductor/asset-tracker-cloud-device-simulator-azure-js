@@ -10,13 +10,9 @@ import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/int
 import chalk from 'chalk'
 import * as fs from 'fs'
 import * as os from 'os'
-import * as path from 'path'
-import { fileURLToPath } from 'url'
 import { v4 } from 'uuid'
 
 const cellId = process.env.CELL_ID
-
-const __dirname = fileURLToPath(import.meta.url)
 
 export const simulator = async (): Promise<void> => {
 	const certJSON = process.argv[process.argv.length - 1]
@@ -48,18 +44,6 @@ export const simulator = async (): Promise<void> => {
 		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
 		clientCert: Buffer.from(clientCert),
-		caCert: Buffer.from(
-			fs.readFileSync(
-				path.resolve(
-					__dirname,
-					'..',
-					'..',
-					'data',
-					'BaltimoreCyberTrustRoot.pem',
-				),
-				'utf-8',
-			),
-		),
 		deviceId,
 		registration,
 		idScope,

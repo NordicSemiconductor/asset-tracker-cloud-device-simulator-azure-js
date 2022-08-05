@@ -10,7 +10,6 @@ export const connectDevice = async ({
 	deviceId,
 	privateKey,
 	clientCert,
-	caCert,
 	idScope,
 	log,
 	registration,
@@ -19,7 +18,6 @@ export const connectDevice = async ({
 	deviceId: string
 	privateKey: Buffer
 	clientCert: Buffer
-	caCert: Buffer
 	registration?: DeviceRegistrationState
 	idScope: string
 	log?: (...args: any[]) => void
@@ -28,17 +26,16 @@ export const connectDevice = async ({
 	client: MqttClient
 	registration: DeviceRegistrationState
 }> => {
-	const acutalRegistration: DeviceRegistrationState =
+	const actualRegistration: DeviceRegistrationState =
 		registration ??
 		(await provision({
-			caCert,
 			clientCert,
 			deviceId,
 			idScope,
 			privateKey,
 			log,
 		}))
-	const host = acutalRegistration.assignedHub
+	const host = actualRegistration.assignedHub
 	return new Promise((resolve, reject) => {
 		try {
 			log?.(`Connecting to`, host)
@@ -64,7 +61,7 @@ export const connectDevice = async ({
 				)
 				resolve({
 					client,
-					registration: acutalRegistration,
+					registration: actualRegistration,
 				})
 			})
 		} catch (err) {
