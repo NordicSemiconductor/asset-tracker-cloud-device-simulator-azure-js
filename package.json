@@ -9,9 +9,7 @@
   },
   "scripts": {
     "test": "jest",
-    "postinstall": "husky install",
-    "prepublishOnly": "pinst --disable",
-    "postpublish": "pinst --enable",
+    "prepare": "husky install",
     "compile": "swc ./simulator -d ./dist"
   },
   "repository": {
