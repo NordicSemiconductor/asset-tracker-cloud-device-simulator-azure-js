@@ -9,7 +9,9 @@ import {
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import chalk from 'chalk'
 import * as fs from 'fs'
+import { readFile } from 'fs/promises'
 import * as os from 'os'
+import path from 'path'
 import { v4 } from 'uuid'
 
 const cellId = process.env.CELL_ID
@@ -17,22 +19,20 @@ const cellId = process.env.CELL_ID
 export const simulator = async (): Promise<void> => {
 	const certJSON = process.argv[process.argv.length - 1]
 	let privateKey: string,
-		clientCert: string,
+		fullChain: string,
 		deviceId: string,
 		registration: DeviceRegistrationState | undefined,
 		idScope: string,
 		c: any
 	try {
 		c = JSON.parse(fs.readFileSync(certJSON, 'utf-8')) as {
-			privateKey: string
-			clientCert: string
-			clientId: string
-			resourceGroup: string
-			registration?: DeviceRegistrationState
 			idScope: string
+			clientId: string
+			privateKey: string
+			fullChain: string
 		}
 		privateKey = c.privateKey
-		clientCert = c.clientCert
+		fullChain = c.fullChain
 		deviceId = c.clientId
 		registration = c.registration
 		idScope = c.idScope
@@ -43,7 +43,13 @@ export const simulator = async (): Promise<void> => {
 	const { client, registration: actualRegistration } = await connectDevice({
 		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
-		clientCert: Buffer.from(clientCert),
+		fullChain: Buffer.from(fullChain),
+		digicertRoot: await readFile(
+			path.join(process.cwd(), 'data', 'DigiCertTLSECCP384RootG5.crt.pem'),
+		),
+		baltimoreRoot: await readFile(
+			path.join(process.cwd(), 'data', 'BaltimoreCyberTrustRoot.pem'),
+		),
 		deviceId,
 		registration,
 		idScope,
@@ -51,7 +57,7 @@ export const simulator = async (): Promise<void> => {
 			console.log(
 				chalk.magenta(`${info}:`),
 				chalk.yellow(context),
-				...rest.map(chalk.gray),
+				...rest.map((s) => chalk.gray(s)),
 			),
 	})
 
