@@ -10,8 +10,7 @@ import os from 'node:os'
 export const connectDevice = async ({
 	deviceId,
 	privateKey,
-	clientCert,
-	caCert,
+	fullChain,
 	digicertRoot,
 	baltimoreRoot,
 	idScope,
@@ -25,15 +24,9 @@ export const connectDevice = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The device's client certificate
+	 * The full device certificate chain (device certificate, intermediate certificate, root certificate)
 	 */
-	clientCert: Buffer
-	/**
-	 * The CA certificate registered in the IoT Hub Device Provisioning instance.
-	 * This is referred to as the "root" certificate.
-	 * It is not the "intermediate" certificate.
-	 */
-	caCert: Buffer
+	fullChain: Buffer
 	/**
 	 * The Digicert G5 root certificate
 	 */
@@ -55,8 +48,7 @@ export const connectDevice = async ({
 		(await provision({
 			deviceId,
 			privateKey,
-			clientCert,
-			caCert,
+			fullChain,
 			digicertRoot,
 			baltimoreRoot,
 			idScope,
@@ -78,8 +70,8 @@ export const connectDevice = async ({
 				username,
 				protocolVersion: 4,
 				key: privateKey,
-				cert: clientCert,
-				ca: [caCert, digicertRoot, baltimoreRoot].join(os.EOL),
+				cert: fullChain,
+				ca: [digicertRoot, baltimoreRoot].join(os.EOL),
 			})
 			client.on('connect', async () => {
 				log?.('Connected', deviceId)

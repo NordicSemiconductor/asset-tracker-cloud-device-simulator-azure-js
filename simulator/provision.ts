@@ -8,8 +8,7 @@ import { v4 } from 'uuid'
 export const provision = async ({
 	deviceId,
 	privateKey,
-	clientCert,
-	caCert,
+	fullChain,
 	digicertRoot,
 	baltimoreRoot,
 	idScope,
@@ -21,15 +20,9 @@ export const provision = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The device's client certificate
+	 * The full device certificate chain (device certificate, intermediate certificate, root certificate)
 	 */
-	clientCert: Buffer
-	/**
-	 * The CA certificate registered in the IoT Hub Device Provisioning instance.
-	 * This is referred to as the "root" certificate.
-	 * It is not the "intermediate" certificate.
-	 */
-	caCert: Buffer
+	fullChain: Buffer
 	/**
 	 * The Digicert G5 root certificate
 	 */
@@ -58,8 +51,8 @@ export const provision = async ({
 		protocol: 'mqtts',
 		protocolVersion: 4,
 		key: privateKey,
-		cert: [clientCert].join(os.EOL),
-		ca: [caCert, digicertRoot, baltimoreRoot].join(os.EOL),
+		cert: fullChain,
+		ca: [digicertRoot, baltimoreRoot].join(os.EOL),
 	})
 
 	// To register a device through DPS, a device should subscribe using $dps/registrations/res/# as a Topic Filter. The multi-level wildcard # in the Topic Filter is used only to allow the device to receive additional properties in the topic name. DPS does not allow the usage of the # or ? wildcards for filtering of subtopics. Since DPS is not a general-purpose pub-sub messaging broker, it only supports the documented topic names and topic filters.

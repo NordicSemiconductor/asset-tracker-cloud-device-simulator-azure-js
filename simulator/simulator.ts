@@ -19,25 +19,20 @@ const cellId = process.env.CELL_ID
 export const simulator = async (): Promise<void> => {
 	const certJSON = process.argv[process.argv.length - 1]
 	let privateKey: string,
-		clientCert: string,
-		caCert: string,
+		fullChain: string,
 		deviceId: string,
 		registration: DeviceRegistrationState | undefined,
 		idScope: string,
 		c: any
 	try {
 		c = JSON.parse(fs.readFileSync(certJSON, 'utf-8')) as {
-			privateKey: string
-			clientCert: string
-			caCert: string
-			clientId: string
-			resourceGroup: string
-			registration?: DeviceRegistrationState
 			idScope: string
+			clientId: string
+			privateKey: string
+			fullChain: string
 		}
 		privateKey = c.privateKey
-		clientCert = c.clientCert
-		caCert = c.caCert
+		fullChain = c.fullChain
 		deviceId = c.clientId
 		registration = c.registration
 		idScope = c.idScope
@@ -48,8 +43,7 @@ export const simulator = async (): Promise<void> => {
 	const { client, registration: actualRegistration } = await connectDevice({
 		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
-		clientCert: Buffer.from(clientCert),
-		caCert: Buffer.from(caCert),
+		fullChain: Buffer.from(fullChain),
 		digicertRoot: await readFile(
 			path.join(process.cwd(), 'data', 'DigiCertTLSECCP384RootG5.crt.pem'),
 		),
