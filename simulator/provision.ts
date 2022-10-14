@@ -8,7 +8,8 @@ import { v4 } from 'uuid'
 export const provision = async ({
 	deviceId,
 	privateKey,
-	fullChain,
+	certificate,
+	intermediateCA,
 	digicertRoot,
 	baltimoreRoot,
 	idScope,
@@ -20,9 +21,17 @@ export const provision = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The full device certificate chain (device certificate, intermediate certificate, root certificate)
+	 * The device certificate
 	 */
-	fullChain: Buffer
+	certificate: Buffer
+	/**
+	 * The intermediate CA certificate
+	 */
+	intermediateCA: Buffer
+	/**
+	 * The root CA certificate
+	 */
+	rootCA: Buffer
 	/**
 	 * The Digicert G5 root certificate
 	 */
@@ -51,7 +60,7 @@ export const provision = async ({
 		protocol: 'mqtts',
 		protocolVersion: 4,
 		key: privateKey,
-		cert: fullChain,
+		cert: [certificate, intermediateCA].join(os.EOL),
 		ca: [digicertRoot, baltimoreRoot].join(os.EOL),
 	})
 

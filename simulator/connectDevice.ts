@@ -10,7 +10,9 @@ import os from 'node:os'
 export const connectDevice = async ({
 	deviceId,
 	privateKey,
-	fullChain,
+	certificate,
+	intermediateCA,
+	rootCA,
 	digicertRoot,
 	baltimoreRoot,
 	idScope,
@@ -24,9 +26,17 @@ export const connectDevice = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The full device certificate chain (device certificate, intermediate certificate, root certificate)
+	 * The device certificate
 	 */
-	fullChain: Buffer
+	certificate: Buffer
+	/**
+	 * The intermediate CA certificate
+	 */
+	intermediateCA: Buffer
+	/**
+	 * The root CA certificate
+	 */
+	rootCA: Buffer
 	/**
 	 * The Digicert G5 root certificate
 	 */
@@ -48,7 +58,9 @@ export const connectDevice = async ({
 		(await provision({
 			deviceId,
 			privateKey,
-			fullChain,
+			certificate,
+			intermediateCA,
+			rootCA,
 			digicertRoot,
 			baltimoreRoot,
 			idScope,
@@ -70,7 +82,7 @@ export const connectDevice = async ({
 				username,
 				protocolVersion: 4,
 				key: privateKey,
-				cert: fullChain,
+				cert: [certificate, intermediateCA].join(os.EOL),
 				ca: [digicertRoot, baltimoreRoot].join(os.EOL),
 			})
 			client.on('connect', async () => {
