@@ -1,17 +1,14 @@
 import { dpsTopics } from '#simulator/dpsTopics.js'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import { connect } from 'mqtt'
-import os from 'node:os'
 import { URLSearchParams } from 'url'
 import { v4 } from 'uuid'
 
 export const provision = async ({
 	deviceId,
 	privateKey,
-	certificate,
-	intermediateCA,
-	digicertRoot,
-	baltimoreRoot,
+	clientCert,
+	caCert,
 	idScope,
 	log,
 }: {
@@ -21,25 +18,13 @@ export const provision = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The device certificate
+	 * The device's certificate
 	 */
-	certificate: Buffer
+	clientCert: Buffer
 	/**
-	 * The intermediate CA certificate
+	 * The CA certificate
 	 */
-	intermediateCA: Buffer
-	/**
-	 * The root CA certificate
-	 */
-	rootCA: Buffer
-	/**
-	 * The Digicert G5 root certificate
-	 */
-	digicertRoot: Buffer
-	/**
-	 * The Baltimore root certificate
-	 */
-	baltimoreRoot: Buffer
+	caCert: Buffer
 	idScope: string
 	log?: (...args: any[]) => void
 }): Promise<DeviceRegistrationState> => {
@@ -60,8 +45,8 @@ export const provision = async ({
 		protocol: 'mqtts',
 		protocolVersion: 4,
 		key: privateKey,
-		cert: [certificate, intermediateCA].join(os.EOL),
-		ca: [digicertRoot, baltimoreRoot].join(os.EOL),
+		cert: clientCert,
+		ca: caCert,
 	})
 
 	// To register a device through DPS, a device should subscribe using $dps/registrations/res/# as a Topic Filter. The multi-level wildcard # in the Topic Filter is used only to allow the device to receive additional properties in the topic name. DPS does not allow the usage of the # or ? wildcards for filtering of subtopics. Since DPS is not a general-purpose pub-sub messaging broker, it only supports the documented topic names and topic filters.

@@ -9,9 +9,7 @@ import {
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import chalk from 'chalk'
 import * as fs from 'fs'
-import { readFile } from 'fs/promises'
 import * as os from 'os'
-import path from 'path'
 import { v4 } from 'uuid'
 
 const cellId = process.env.CELL_ID
@@ -19,9 +17,8 @@ const cellId = process.env.CELL_ID
 export const simulator = async (): Promise<void> => {
 	const certJSON = process.argv[process.argv.length - 1]
 	let privateKey: string,
-		certificate: string,
-		intermediateCA: string,
-		rootCA: string,
+		clientCert: string,
+		caCert: string,
 		deviceId: string,
 		registration: DeviceRegistrationState | undefined,
 		idScope: string,
@@ -31,14 +28,12 @@ export const simulator = async (): Promise<void> => {
 			idScope: string
 			clientId: string
 			privateKey: string
-			certificate: string
-			intermediateCA: string
-			rootCA: string
+			clientCert: string
+			caCert: string
 		}
 		privateKey = c.privateKey
-		certificate = c.certificate
-		intermediateCA = c.intermediateCA
-		rootCA = c.rootCA
+		clientCert = c.clientCert
+		caCert = c.caCert
 		deviceId = c.clientId
 		registration = c.registration
 		idScope = c.idScope
@@ -49,15 +44,8 @@ export const simulator = async (): Promise<void> => {
 	const { client, registration: actualRegistration } = await connectDevice({
 		modelId: 'dtmi:AzureDeviceUpdate;1',
 		privateKey: Buffer.from(privateKey),
-		certificate: Buffer.from(certificate),
-		intermediateCA: Buffer.from(intermediateCA),
-		rootCA: Buffer.from(rootCA),
-		digicertRoot: await readFile(
-			path.join(process.cwd(), 'data', 'DigiCertTLSECCP384RootG5.crt.pem'),
-		),
-		baltimoreRoot: await readFile(
-			path.join(process.cwd(), 'data', 'BaltimoreCyberTrustRoot.pem'),
-		),
+		clientCert: Buffer.from(clientCert),
+		caCert: Buffer.from(caCert),
 		deviceId,
 		registration,
 		idScope,

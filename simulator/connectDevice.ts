@@ -1,7 +1,6 @@
 import { provision } from '#simulator/provision.js'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import { connect, MqttClient } from 'mqtt'
-import os from 'node:os'
 
 /**
  * Connect the device to the Azure IoT Hub.
@@ -10,11 +9,8 @@ import os from 'node:os'
 export const connectDevice = async ({
 	deviceId,
 	privateKey,
-	certificate,
-	intermediateCA,
-	rootCA,
-	digicertRoot,
-	baltimoreRoot,
+	clientCert,
+	caCert,
 	idScope,
 	log,
 	registration,
@@ -26,25 +22,13 @@ export const connectDevice = async ({
 	 */
 	privateKey: Buffer
 	/**
-	 * The device certificate
+	 * The device's certificate
 	 */
-	certificate: Buffer
+	clientCert: Buffer
 	/**
-	 * The intermediate CA certificate
+	 * The CA certificate
 	 */
-	intermediateCA: Buffer
-	/**
-	 * The root CA certificate
-	 */
-	rootCA: Buffer
-	/**
-	 * The Digicert G5 root certificate
-	 */
-	digicertRoot: Buffer
-	/**
-	 * The Baltimore root certificate
-	 */
-	baltimoreRoot: Buffer
+	caCert: Buffer
 	registration?: DeviceRegistrationState
 	idScope: string
 	log?: (...args: any[]) => void
@@ -58,11 +42,8 @@ export const connectDevice = async ({
 		(await provision({
 			deviceId,
 			privateKey,
-			certificate,
-			intermediateCA,
-			rootCA,
-			digicertRoot,
-			baltimoreRoot,
+			clientCert,
+			caCert,
 			idScope,
 			log,
 		}))
@@ -82,8 +63,8 @@ export const connectDevice = async ({
 				username,
 				protocolVersion: 4,
 				key: privateKey,
-				cert: [certificate, intermediateCA].join(os.EOL),
-				ca: [digicertRoot, baltimoreRoot].join(os.EOL),
+				cert: clientCert,
+				ca: caCert,
 			})
 			client.on('connect', async () => {
 				log?.('Connected', deviceId)
