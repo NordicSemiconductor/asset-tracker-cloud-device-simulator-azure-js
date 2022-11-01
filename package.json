@@ -28,7 +28,7 @@
   "author": "Nordic Semiconductor ASA | nordicsemi.no",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "@nordicsemiconductor/asset-tracker-cloud-device-ui-server": "5.0.1",
+    "@nordicsemiconductor/asset-tracker-cloud-device-ui-server": "5.0.2",
     "azure-iot-provisioning-service": "1.10.1",
     "chalk": "5.1.2",
     "mqtt": "4.3.7",
