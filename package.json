@@ -33,7 +33,7 @@
     "chalk": "5.1.2",
     "mqtt": "4.3.7",
     "node-fetch": "3.3.0",
-    "regenerator-runtime": "0.13.10",
+    "regenerator-runtime": "0.13.11",
     "uuid": "9.0.0"
   },
   "devDependencies": {
