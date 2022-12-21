@@ -9,8 +9,8 @@ import {
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import chalk from 'chalk'
 import * as fs from 'fs'
+import { randomUUID } from 'node:crypto'
 import * as os from 'os'
-import { v4 } from 'uuid'
 
 const cellId = process.env.CELL_ID
 
@@ -164,7 +164,7 @@ export const simulator = async (): Promise<void> => {
 	const updateTwinReported = (update: { [key: string]: any }) => {
 		console.log(chalk.magenta('>'), chalk.cyan(JSON.stringify(update)))
 		client.publish(
-			deviceTopics.updateTwinReported(v4()),
+			deviceTopics.updateTwinReported(randomUUID()),
 			JSON.stringify(update),
 		)
 	}
@@ -362,7 +362,7 @@ export const simulator = async (): Promise<void> => {
 	client.subscribe(`${deviceId}/pgps`)
 	client.subscribe(`${deviceId}/agps`)
 
-	const getTwinPropertiesRequestId = v4()
+	const getTwinPropertiesRequestId = randomUUID()
 
 	console.log(chalk.green('Connected:'), chalk.blueBright(deviceId))
 
