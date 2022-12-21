@@ -1,8 +1,8 @@
 import { dpsTopics } from '#simulator/dpsTopics.js'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import { connect } from 'mqtt'
+import { randomUUID } from 'node:crypto'
 import { URLSearchParams } from 'url'
-import { v4 } from 'uuid'
 
 export const provision = async ({
 	deviceId,
@@ -57,7 +57,7 @@ export const provision = async ({
 
 		// The device should publish a register message to DPS using $dps/registrations/PUT/iotdps-register/?$rid={request_id} as a Topic Name. The payload should contain the Device Registration object in JSON format. In a successful scenario, the device will receive a response on the $dps/registrations/res/202/?$rid={request_id}&retry-after=x topic name where x is the retry-after value in seconds. The payload of the response will contain the RegistrationOperationStatus object in JSON format.
 		client.publish(
-			dpsTopics.register(v4()),
+			dpsTopics.register(randomUUID()),
 			JSON.stringify({
 				registrationId: deviceId,
 			}),
@@ -76,7 +76,10 @@ export const provision = async ({
 					log?.('[DPS]', 'Retry after', args.get('retry-after' as string))
 					setTimeout(() => {
 						// Assuming that the device has already subscribed to the $dps/registrations/res/# topic as indicated above, it can publish a get operationstatus message to the $dps/registrations/GET/iotdps-get-operationstatus/?$rid={request_id}&operationId={operationId} topic name. The operation ID in this message should be the value received in the RegistrationOperationStatus response message in the previous step.
-						client.publish(dpsTopics.registationStatus(v4(), operationId), '')
+						client.publish(
+							dpsTopics.registationStatus(randomUUID(), operationId),
+							'',
+						)
 					}, parseInt(args.get('retry-after') ?? '1', 10) * 1000)
 					return
 				}
