@@ -9,7 +9,7 @@
 [![ESLint: TypeScript](https://img.shields.io/badge/ESLint-TypeScript-blue.svg)](https://github.com/typescript-eslint/typescript-eslint)
 
 Simulates an nRF9160-based device for the
-[nRF Asset Tracker for Azure](https://github.com/NordicSemiconductor/asset-tracker-cloud-device-simulator-azure-js).
+[nRF Asset Tracker for Azure](https://github.com/NordicSemiconductor/asset-tracker-cloud-azure-js).
 
 ## Standalone usage
 
