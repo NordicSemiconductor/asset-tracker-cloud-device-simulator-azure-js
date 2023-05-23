@@ -29,7 +29,7 @@
   "license": "BSD-3-Clause",
   "dependencies": {
     "@nordicsemiconductor/asset-tracker-cloud-device-ui-server": "6.0.0",
-    "azure-iot-provisioning-service": "1.11.1",
+    "azure-iot-provisioning-service": "1.11.2",
     "chalk": "5.2.0",
     "mqtt": "4.3.7",
     "node-fetch": "3.3.1",
