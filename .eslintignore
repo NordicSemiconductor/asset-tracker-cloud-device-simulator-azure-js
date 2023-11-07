@@ -3,4 +3,3 @@ node_modules/
 dist/
 certificates/
 build/
-jest.config.js
