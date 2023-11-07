@@ -1,14 +1,19 @@
-import { encodePropertyBag } from '#simulator/encodePropertyBag.js'
+import { describe, test as it } from 'node:test'
+import assert from 'node:assert'
+import { encodePropertyBag } from './encodePropertyBag.js'
 
 describe('encodePropertyBag', () => {
-	it.each([undefined, {}])('should return an empty string for %j', (bag) =>
-		expect(encodePropertyBag(bag as any)).toEqual(''),
-	)
-	it('should encode a single nulled property', () =>
-		expect(encodePropertyBag({ batch: null })).toEqual('batch'))
+	for (const input of [undefined, {}]) {
+		it('should return an empty string for %j', () => {
+			assert.equal(encodePropertyBag(input as any), '')
+		})
+	}
+	it('should encode a single nulled property', () => {
+		assert.equal(encodePropertyBag({ batch: null }), 'batch')
+	})
 
 	describe('it should encode properties', () => {
-		it.each([
+		for (const [props, expected] of [
 			// Sample from https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#receiving-cloud-to-device-messages
 			// Note: "?" is not included.
 			[
@@ -26,12 +31,27 @@ describe('encodePropertyBag', () => {
 				},
 				'%24.ct=application%2Fjson&%24.ce=utf-8',
 			],
-		])('%j => %s', (props, expected) =>
-			expect(encodePropertyBag(props)).toEqual(expected),
-		)
+		] as [
+			(
+				| {
+						prop1: null
+						prop2: string
+						prop3: string
+				  }
+				| {
+						'$.ct': string
+						'$.ce': string
+				  }
+			),
+			string,
+		][]) {
+			it('%j => %s', () => {
+				assert.equal(encodePropertyBag(props), expected)
+			})
+		}
 	})
 	describe('it should sort $ properties to the end', () => {
-		it.each([
+		for (const [input, expected] of [
 			[
 				{
 					'$.ct': 'application/json',
@@ -49,8 +69,25 @@ describe('encodePropertyBag', () => {
 				},
 				'prop1&prop3=a%20string&%24.ct=application%2Fjson&%24.ce=utf-8',
 			],
-		])('%j => %s', (props, expected) =>
-			expect(encodePropertyBag(props)).toEqual(expected),
-		)
+		] as [
+			(
+				| {
+						'$.ct': string
+						'$.ce': string
+						prop1: null
+				  }
+				| {
+						'$.ct': string
+						prop1: null
+						'$.ce': string
+						prop3: string
+				  }
+			),
+			string,
+		][]) {
+			it('%j => %s', () => {
+				assert.equal(encodePropertyBag(input), expected)
+			})
+		}
 	})
 })
