@@ -2,17 +2,17 @@ import { describe, test as it } from 'node:test'
 import assert from 'node:assert'
 import { encodePropertyBag } from './encodePropertyBag.js'
 
-describe('encodePropertyBag', () => {
+void describe('encodePropertyBag', () => {
 	for (const input of [undefined, {}]) {
-		it('should return an empty string for %j', () => {
+		void it('should return an empty string for %j', () => {
 			assert.equal(encodePropertyBag(input as any), '')
 		})
 	}
-	it('should encode a single nulled property', () => {
+	void it('should encode a single nulled property', () => {
 		assert.equal(encodePropertyBag({ batch: null }), 'batch')
 	})
 
-	describe('it should encode properties', () => {
+	void describe('it should encode properties', () => {
 		for (const [props, expected] of [
 			// Sample from https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-mqtt-support#receiving-cloud-to-device-messages
 			// Note: "?" is not included.
@@ -45,12 +45,12 @@ describe('encodePropertyBag', () => {
 			),
 			string,
 		][]) {
-			it('%j => %s', () => {
+			void it('%j => %s', () => {
 				assert.equal(encodePropertyBag(props), expected)
 			})
 		}
 	})
-	describe('it should sort $ properties to the end', () => {
+	void describe('it should sort $ properties to the end', () => {
 		for (const [input, expected] of [
 			[
 				{
@@ -85,7 +85,7 @@ describe('encodePropertyBag', () => {
 			),
 			string,
 		][]) {
-			it('%j => %s', () => {
+			void it('%j => %s', () => {
 				assert.equal(encodePropertyBag(input), expected)
 			})
 		}
