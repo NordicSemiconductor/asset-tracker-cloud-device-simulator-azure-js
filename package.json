@@ -8,7 +8,7 @@
     "#simulator/*.js": "./dist/*.js"
   },
   "scripts": {
-    "test": "find ./ -type f -name '*.spec.ts' ! -path '*/node_modules/*' -exec npx tsx {} ';'",
+    "test": "npx tsx --test ./simulator/*.spec.ts",
     "prepare": "husky install",
     "compile": "swc ./simulator -d ./dist"
   },
