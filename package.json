@@ -30,7 +30,7 @@
   "dependencies": {
     "azure-iot-provisioning-service": "1.11.2",
     "chalk": "5.3.0",
-    "mqtt": "5.3.1"
+    "mqtt": "5.3.2"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "18.4.3",
