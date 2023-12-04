@@ -2,10 +2,6 @@ import { connectDevice } from '#simulator/connectDevice.js'
 import { defaultConfig } from '#simulator/defaultConfig.js'
 import { deviceTopics } from '#simulator/deviceTopics.js'
 import { Status } from '#simulator/fota.js'
-import {
-	uiServer,
-	WebSocketConnection,
-} from '@nordicsemiconductor/asset-tracker-cloud-device-ui-server'
 import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
 import chalk from 'chalk'
 import * as fs from 'fs'
@@ -144,23 +140,6 @@ export const simulator = async (): Promise<void> => {
 		...defaultConfig,
 	}
 
-	let wsConnection: WebSocketConnection
-	const wsNotify = (message: Record<string, any>) => {
-		if (wsConnection !== undefined) {
-			console.log(chalk.magenta('[ws>'), JSON.stringify(message))
-			wsConnection.send(JSON.stringify(message))
-		} else {
-			console.warn(chalk.red('Websocket not connected.'))
-		}
-	}
-
-	const sendConfigToUi = () => {
-		if (wsConnection !== undefined) {
-			console.log(chalk.magenta('[ws>'), JSON.stringify(cfg))
-			wsNotify({ config: cfg })
-		}
-	}
-
 	const updateTwinReported = (update: { [key: string]: any }) => {
 		console.log(chalk.magenta('>'), chalk.cyan(JSON.stringify(update)))
 		client.publish(
@@ -177,17 +156,6 @@ export const simulator = async (): Promise<void> => {
 		console.log(chalk.blue('Config:'))
 		console.log(cfg)
 		updateTwinReported({ cfg, ...devRoam, ...modelData })
-		sendConfigToUi()
-	}
-
-	const messageHandler = (topic: string) => (message: string, path: string) => {
-		console.log(chalk.magenta('[ws<'), JSON.stringify({ message, path }))
-		console.log(
-			chalk.magenta('<'),
-			chalk.blue.blueBright(topic),
-			chalk.cyan(message),
-		)
-		client.publish(topic, message)
 	}
 
 	/**
@@ -366,53 +334,6 @@ export const simulator = async (): Promise<void> => {
 
 	console.log(chalk.green('Connected:'), chalk.blueBright(deviceId))
 
-	const port = await uiServer({
-		deviceId,
-		onUpdate: updateTwinReported,
-		onSensorMessage: (message) => {
-			console.log(
-				chalk.magenta('>'),
-				chalk.yellow(deviceTopics.messages(deviceId)),
-			)
-			console.log(chalk.magenta('>'), chalk.cyan(JSON.stringify(message)))
-			client.publish(deviceTopics.messages(deviceId), JSON.stringify(message))
-		},
-		onBatch: (update) => {
-			console.log(
-				chalk.magenta('>'),
-				chalk.yellow(deviceTopics.batch(deviceId)),
-			)
-			console.log(chalk.magenta('>'), chalk.cyan(JSON.stringify(update)))
-			client.publish(deviceTopics.batch(deviceId), JSON.stringify(update))
-		},
-		onWsConnection: (c) => {
-			console.log(chalk.magenta('[ws]'), chalk.cyan('connected'))
-			wsConnection = c
-			sendConfigToUi()
-		},
-		onMessage: {
-			'/pgps/get': messageHandler(
-				deviceTopics.messages(deviceId, { pgps: 'get' }),
-			),
-			'/agps/get': messageHandler(
-				deviceTopics.messages(deviceId, { agps: 'get' }),
-			),
-			'/ncellmeas': messageHandler(
-				deviceTopics.messages(deviceId, { ncellmeas: null }),
-			),
-		},
-	})
-
-	console.log()
-	console.log(
-		'',
-		chalk.yellowBright(
-			`To control this device use this endpoint in the device simulator UI:`,
-		),
-		chalk.blueBright(`http://localhost:${port}`),
-	)
-	console.log()
-
 	const getTwinPropertiesTopic = deviceTopics.getTwinProperties(
 		getTwinPropertiesRequestId,
 	)
@@ -453,8 +374,6 @@ export const simulator = async (): Promise<void> => {
 			simulateADU(desiredUpdate)
 			return
 		}
-
-		wsNotify({ message: { topic, payload: payload.toString() } })
 	})
 
 	client.on('error', (err) => {
