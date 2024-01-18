@@ -8,7 +8,7 @@
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
-      "#simulator/*": ["simulator/*"]
-    }
-  }
+      "#simulator/*": ["simulator/*"],
+    },
+  },
 }
