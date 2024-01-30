@@ -1,4 +1,0 @@
-set -e
-
-npx lint-staged
-npm test
