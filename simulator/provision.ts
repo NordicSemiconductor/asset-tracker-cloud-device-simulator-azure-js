@@ -1,5 +1,5 @@
 import { dpsTopics } from '#simulator/dpsTopics.js'
-import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces'
+import { DeviceRegistrationState } from 'azure-iot-provisioning-service/dist/interfaces.js'
 import { connect } from 'mqtt'
 import { randomUUID } from 'node:crypto'
 import { URLSearchParams } from 'url'

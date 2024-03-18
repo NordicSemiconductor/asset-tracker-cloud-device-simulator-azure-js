@@ -15,8 +15,8 @@
     "forceConsistentCasingInFileNames": true,
     "noImplicitAny": true,
     "noEmit": true,
-    "moduleResolution": "node",
-    "module": "ES2020",
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
     "paths": {
