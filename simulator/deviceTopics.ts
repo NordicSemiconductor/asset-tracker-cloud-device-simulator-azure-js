@@ -1,4 +1,5 @@
-import { encodePropertyBag, PropertyBag } from '#simulator/encodePropertyBag.js'
+import type { PropertyBag } from '#simulator/encodePropertyBag.js'
+import { encodePropertyBag } from '#simulator/encodePropertyBag.js'
 
 const encodingProperties = {
 	'$.ct': 'application/json',
